@@ -1,0 +1,42 @@
+<h1> <%=link_to "Posts", "/" %> </h1>
+<h1> Filter by tag </h1>
+
+<div>
+<% @tags.each do |tag| %>
+  <div>#<%= link_to tag.name, root_url + "posts/filter/" + tag.name %></div>
+<% end %>
+</div>
+
+
+
+
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Author</th>
+      <th>Title</th>
+      <th>Body</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @posts.each do |post| %>
+      <% tag_string = '' %>
+      <% post.tags.each do |t| %>
+        <% tag_string += t[:name] + ', '%>
+      <% end %>
+      <% tag_string = tag_string[0...-2] %>
+      <tr>
+        <td><%= post.author %></td>
+        <td><%= post.title %></td>
+        <td><%= post.body %></td>
+        <td><%= tag_string %></td>
+        <td><%= link_to 'Edit', edit_post_path(post) %></td>
+        <td><%= link_to 'Destroy', post, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
