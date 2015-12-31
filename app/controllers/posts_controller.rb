@@ -47,9 +47,8 @@ class PostsController < ApplicationController
   def create
     @post = Post.new(post_params)
     @tag_string = params[:post_tags]
-
-
     tags = params[:post_tags].split(',')
+    found_tag = Tag.new
     tags.each do |t|
       t = remove_spaces t
       next if t.length == 0
@@ -58,10 +57,9 @@ class PostsController < ApplicationController
         @tag = Tag.create(name: t)
         @post.tags << [@tag]
       else
-        found_tag.posts << [@post]
+        @post.tags << found_tag
       end
     end
-
     respond_to do |format|
       if @post.save
         format.html { redirect_to posts_url, notice: 'Post was successfully created.' }
