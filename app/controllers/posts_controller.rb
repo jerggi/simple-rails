@@ -1,3 +1,5 @@
+require 'uri'
+
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :edit, :update, :destroy]
 
@@ -6,23 +8,13 @@ class PostsController < ApplicationController
   def index
     @posts = Post.all
     @tags = Tag.all
-
   end
 
-  # GET /posts/1
-  # GET /posts/1.json
-  def show
-    post = Post.find params[:id]
-    @tag_string = ''
-    post.tags.each do |tag|
-      @tag_string += tag[:name] + ', '
-    end
-    @tag_string = @tag_string[0...-2]
-  end
-
+  # GET /posts/filter/tagname
   def filter
     @tags = Tag.all
-    filter_tag = Tag.find_by name: params[:name]
+    decoded_url = URI.decode params[:name]
+    filter_tag = Tag.find_by name: decoded_url
     @posts = filter_tag.posts
   end
 
@@ -66,18 +58,8 @@ class PostsController < ApplicationController
     @post.tags.clear
     @tag_string = params[:post_tags]
     remove_empty_tags
-    tags = params[:post_tags].split(',')
-    tags.each do |t|
-      t = remove_spaces t
-      next if t.length == 0
-      found_tag = Tag.find_by name: t
-      if found_tag.nil?
-        @tag = Tag.create(name: t)
-        @post.tags << [@tag]
-      else
-        found_tag.posts << [@post]
-      end
-    end
+
+    @post.update_post @tag_string
     respond_to do |format|
       if @post.update(post_params)
         format.html { redirect_to posts_url, notice: 'Post was successfully updated.' }
@@ -103,34 +85,22 @@ class PostsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_post
-      @post = Post.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def post_params
-      params.require(:post).permit(:author, :title, :body)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_post
+    @post = Post.find(params[:id])
+  end
 
-    def remove_empty_tags
-      tags = Tag.all
-      tags.each do |t|
-        posts = t.posts
-        t.destroy if posts.empty?
-      end
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def post_params
+    params.require(:post).permit(:author, :title, :body)
+  end
 
-    def remove_spaces(t)
-      loop do
-          break if t.length == 0 || t[0] != ' '
-          t[0] = ''
-      end
-      loop do
-          break if t.length == 0 || t[t.length-1] != ' '
-          t[t.length-1] = ''
-      end
-      t
+  def remove_empty_tags
+    tags = Tag.all
+    tags.each do |t|
+      posts = t.posts
+      t.destroy if posts.empty?
     end
-
+  end
 end

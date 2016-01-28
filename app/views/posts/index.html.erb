@@ -3,9 +3,10 @@
 <h1> Filter by tag </h1>
 <div>
 <% @tags.each do |tag| %>
-  <div>#<%= link_to tag.name, root_url + "posts/filter/" + tag.name %></div>
+  <div>#<%= link_to tag.name, root_url + "posts/filter/#{CGI.escape tag.name}" %></div>
 <% end %>
 </div>
+<br>
 <%= link_to 'New Post', new_post_path %>
 <h1>Listing Posts</h1>
 
