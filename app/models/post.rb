@@ -12,10 +12,10 @@ class Post < ActiveRecord::Base
   end
 
   def save_tags(tag_string)
-    tags = tag_string.split(',')
+    tag_string.gsub!(",", " ")
+    tags = tag_string.split(' ')
     found_tag = Tag.new
     tags.each do |t|
-      t = remove_spaces t
       next if t.length == 0
       found_tag = Tag.find_by name: t
       if found_tag.nil?
@@ -28,10 +28,10 @@ class Post < ActiveRecord::Base
   end
 
   def update_post(tag_string)
-    tags = tag_string.split(',')
+    tag_string.gsub!(",", " ")
+    tags = tag_string.split(' ')
     found_tag = Tag.new
     tags.each do |t|
-      t = remove_spaces t
       next if t.length == 0
       found_tag = Tag.find_by name: t
       if found_tag.nil?
@@ -41,17 +41,6 @@ class Post < ActiveRecord::Base
         self.tags << found_tag
       end
     end
-  end
-
-  def remove_spaces(t)
-    loop do
-      break if t.length == 0 || t[0] != ' '
-      t[0] = ''
-    end
-    loop do
-      break if t.length == 0 || t[t.length - 1] != ' '
-      t[t.length - 1] = ''
-    end
-    t
+    self.touch(:updated_at)
   end
 end

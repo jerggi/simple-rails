@@ -6,8 +6,11 @@ class PostsController < ApplicationController
   # GET /posts
   # GET /posts.json
   def index
-    @posts = Post.all
-    @tags = Tag.all
+    @posts = Post.all.sort_by(&:updated_at).reverse!
+    @tags = Part.select("name, count(post_id) as post_count")
+      .joins("inner join tags on parts.tag_id = tags.id")
+      .group("name")
+      .order("post_count DESC")
   end
 
   # GET /posts/filter/tagname
@@ -15,7 +18,7 @@ class PostsController < ApplicationController
     @tags = Tag.all
     decoded_url = URI.decode params[:name]
     filter_tag = Tag.find_by name: decoded_url
-    @posts = filter_tag.posts
+    @posts = filter_tag.posts.sort_by(&:updated_at).reverse!
   end
 
   # GET /posts/new
@@ -60,6 +63,7 @@ class PostsController < ApplicationController
     remove_empty_tags
 
     @post.update_post @tag_string
+    @post.touch(:updated_at)
     respond_to do |format|
       if @post.update(post_params)
         format.html { redirect_to posts_url, notice: 'Post was successfully updated.' }

@@ -3,7 +3,7 @@
 
 <div>
 <% @tags.each do |tag| %>
-  <div>#<%= link_to tag.name, root_url + "posts/filter/#{CGI.escape tag.name}"%></div>
+  <div>#<%= link_to tag.name, root_url + "posts/filter/#{CGI.escape tag.name}", class: "filter-by-tag"%></div>
 <% end %>
 </div>
 
@@ -29,14 +29,14 @@
         <% tag_string += t[:name] + ', '%>
       <% end %>
       <% tag_string = tag_string[0...-2] %>
-      <tr>
-        <td><%= post.author %></td>
-        <td><%= post.title %></td>
-        <td><%= post.body %></td>
-        <td><%= tag_string %></td>
+      <%= content_tag :tr, id: "post-row-#{post.id}" do -%>
+        <td class="post-author"><%= post.author %></td>
+        <td class="post-title"><%= post.title %></td>
+        <td class="post-body"><%= post.body %></td>
+        <td class="post-tags"><%= tag_string %></td>
         <td><%= link_to 'Edit', edit_post_path(post) %></td>
         <td><%= link_to 'Destroy', post, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
+      <% end -%>
     <% end %>
   </tbody>
 </table>

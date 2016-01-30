@@ -8,17 +8,17 @@
   <div class="field">
     <%= f.label :author %>
     <%= @post.errors[:author][0] %><br>
-    <%= f.text_field :author %>
+    <%= f.text_field :author, id: "post_author" %>
   </div>
   <div class="field">
     <%= f.label :title %>
     <%= @post.errors[:title][0] %><br>
-    <%= f.text_field :title %>
+    <%= f.text_field :title, id: "post_title" %>
   </div>
   <div class="field">
     <%= f.label :body %>
     <%= @post.errors[:body][0] %><br>
-    <%= f.text_area :body %>
+    <%= f.text_area :body, id: "post_body" %>
   </div>
   <div class="field">
     <%= f.label :tags %>
@@ -26,7 +26,7 @@
     <% if @post.errors[:tags].length > 0 %>
       <div class="field_with_errors">
     <% end %>
-    <input type="text" id="post_tags" name="post_tags" value="<%= @tag_string %>"/>
+    <input type="text" id="post_tags_string" name="post_tags" value="<%= @tag_string %>"/>
     <% if @post.errors[:tags].length > 0 %>
       </div>
     <% end %>
