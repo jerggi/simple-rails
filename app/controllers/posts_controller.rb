@@ -15,7 +15,10 @@ class PostsController < ApplicationController
 
   # GET /posts/filter/tagname
   def filter
-    @tags = Tag.all
+    @tags = Part.select("name, count(post_id) as post_count")
+      .joins("inner join tags on parts.tag_id = tags.id")
+      .group("name")
+      .order("post_count DESC")
     decoded_url = URI.decode params[:name]
     filter_tag = Tag.find_by name: decoded_url
     @posts = filter_tag.posts.sort_by(&:updated_at).reverse!
