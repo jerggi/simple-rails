@@ -6,22 +6,16 @@ class PostsController < ApplicationController
   # GET /posts
   # GET /posts.json
   def index
-    @posts = Post.all.sort_by(&:updated_at).reverse!
-    @tags = Part.select("name, count(post_id) as post_count")
-      .joins("inner join tags on parts.tag_id = tags.id")
-      .group("name")
-      .order("post_count DESC")
+    @posts = Post.all.order(updated_at: :DESC)
+    @tags = sorted_tags
   end
 
   # GET /posts/filter/tagname
   def filter
-    @tags = Part.select("name, count(post_id) as post_count")
-      .joins("inner join tags on parts.tag_id = tags.id")
-      .group("name")
-      .order("post_count DESC")
+    @tags = sorted_tags
     decoded_url = URI.decode params[:name]
     filter_tag = Tag.find_by name: decoded_url
-    @posts = filter_tag.posts.sort_by(&:updated_at).reverse!
+    @posts = filter_tag.posts.order(updated_at: :DESC)
   end
 
   # GET /posts/new
@@ -64,7 +58,6 @@ class PostsController < ApplicationController
     @post.tags.clear
     @tag_string = params[:post_tags]
     remove_empty_tags
-
     @post.update_post @tag_string
     @post.touch(:updated_at)
     respond_to do |format|
@@ -82,9 +75,9 @@ class PostsController < ApplicationController
   # DELETE /posts/1
   # DELETE /posts/1.json
   def destroy
+    @post.tags.destroy_all
     @post.destroy
     remove_empty_tags
-
     respond_to do |format|
       format.html { redirect_to posts_url, notice: 'Post was successfully destroyed.' }
       format.json { head :no_content }
@@ -109,5 +102,12 @@ class PostsController < ApplicationController
       posts = t.posts
       t.destroy if posts.empty?
     end
+  end
+
+  def sorted_tags
+    Part.select("name, count(post_id) as post_count")
+      .joins("inner join tags on parts.tag_id = tags.id")
+      .group("name")
+      .order("post_count DESC")
   end
 end
