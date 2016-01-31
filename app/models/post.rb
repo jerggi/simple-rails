@@ -12,7 +12,7 @@ class Post < ActiveRecord::Base
   end
 
   def save_tags(tag_string)
-    tag_string.gsub!(",", " ")
+    tag_string.tr!(",", " ")
     tags = tag_string.split(' ')
     found_tag = Tag.new
     tags.each do |t|
@@ -28,7 +28,7 @@ class Post < ActiveRecord::Base
   end
 
   def update_post(tag_string)
-    tag_string.gsub!(",", " ")
+    tag_string.tr!(",", " ")
     tags = tag_string.split(' ')
     found_tag = Tag.new
     tags.each do |t|
@@ -41,6 +41,5 @@ class Post < ActiveRecord::Base
         self.tags << found_tag
       end
     end
-    self.touch(:updated_at)
   end
 end
